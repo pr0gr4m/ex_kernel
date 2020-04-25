@@ -1,4 +1,4 @@
-obj-m += hello.o
+obj-m += hello.o callee.o caller.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
