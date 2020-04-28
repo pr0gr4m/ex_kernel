@@ -1,6 +1,6 @@
-obj-m += chardev.o
+obj-m += chardev.o ioctl.o
 
-TARGETS = chardev_app
+TARGETS = chardev_app ioctl_app
 
 KDIR := /lib/modules/$(shell uname -r)/build
 

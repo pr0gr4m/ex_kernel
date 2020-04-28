@@ -1,8 +1,8 @@
 # Makefile to build all subdirs
 
-all: basic char_dev
+all: basic_t char_dev_t
 
-basic:
+basic_t:
 	@echo
 	@echo ==================== Build basic directory ====================
 	@echo
@@ -13,7 +13,7 @@ basic:
 	@echo ==================== Build Complete ====================
 	@echo
 
-kernel32:
+char_dev_t:
 	@echo
 	@echo ==================== Build character device directory ====================
 	@echo
