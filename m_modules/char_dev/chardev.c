@@ -61,7 +61,7 @@ int __init init_chardev(void)
     // add a char device to the system
     cdev_err = cdev_add(&chardev_cdev, dev, MINOR_NUM);
     if (cdev_err != 0) {
-        printk(KERN_ERR  "cdev_add = %d\n", alloc_ret);
+        printk(KERN_ERR  "cdev_add = %d\n", cdev_err);
         unregister_chrdev_region(dev, MINOR_NUM);
         return -1;
     }
