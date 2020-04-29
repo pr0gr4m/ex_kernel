@@ -11,16 +11,11 @@
 #define MINOR_BASE			5
 #define MINOR_NUM			1
 
-#define offset_in_page(p)	((unsigned long)(p) & ~PAGE_MASK)
-#define TVMEMSIZE			4096
-
-#define	MAX_TAP				8
-#define MAX_DIGEST_SIZE		64
 #define DEV_NAME			"md5"
 #define MAX_LEN				1024
+#define MD5_LEN				16
 
 static unsigned char plaintext[1024];
-static unsigned int psize;
 
 static char *hash_md5(unsigned char *buf);
 static void hexdump(unsigned char *buf, unsigned int len);
@@ -50,10 +45,7 @@ static int __init md5_init(void)
 	int ret = 0;
 	dev_t dev;
 
-	printk("[Message] md5_init called\n");
-
 	virtual_device = cdev_alloc();
-
 	ret = alloc_chrdev_region(&dev, MINOR_BASE, MINOR_NUM, DEV_NAME);
 	if (ret != 0) {
 		printk(KERN_ERR "alloc_chrdev_region = %d\n", ret);
@@ -62,7 +54,6 @@ static int __init md5_init(void)
 
 	virtual_device_major = MAJOR(dev);
 	dev = MKDEV(virtual_device_major, MINOR_BASE);
-	
 	printk("[Message] major num: %d\n", virtual_device_major);
 
 	cdev_init(virtual_device, &vd_fops);
@@ -74,7 +65,7 @@ static int __init md5_init(void)
 		goto OUT2;
 	}
 
-	virtual_device_class = class_create(THIS_MODULE, "virtual_device");
+	virtual_device_class = class_create(THIS_MODULE, "md5_virtual_device");
 	if (IS_ERR(virtual_device_class)) {
 		printk(KERN_ERR "class_create\n");
 		goto OUT;
@@ -100,9 +91,8 @@ OUT2:
 static void __exit md5_exit(void)
 {
 	dev_t dev = MKDEV(virtual_device_major, MINOR_BASE);
-	printk("[Message] md5_exit called\n");
 
-	device_destroy(virtual_device_class, MKDEV(virtual_device_major, MINOR_BASE));
+	device_destroy(virtual_device_class, dev);
 	class_destroy(virtual_device_class);
 	cdev_del(virtual_device);
 	unregister_chrdev_region(dev, MINOR_NUM);
@@ -111,7 +101,6 @@ static void __exit md5_exit(void)
 
 static int virtual_device_open(struct inode *inode, struct file *filp)
 {
-	printk("[Message] open function called\n");
 	printk("[Message] before open: %d\n", virtual_device_usage.counter);
 
 	if (!atomic_dec_and_test(&virtual_device_usage)) {
@@ -125,7 +114,6 @@ static int virtual_device_open(struct inode *inode, struct file *filp)
 
 static int virtual_device_release(struct inode *inode, struct file *filp)
 {
-	printk("[Message] release function called\n");
 	printk("[Message] before release: %d\n", virtual_device_usage.counter);
 	atomic_inc(&virtual_device_usage);
 	printk("[Message] after release: %d\n", virtual_device_usage.counter);
@@ -136,24 +124,18 @@ static ssize_t virtual_device_write(struct file *filp, const char __user *buf,
 		size_t count, loff_t *f_pos)
 {
 	printk("[Message] write function called\n");
-	if (strlen(buf) > MAX_LEN) {
-		printk("[Message] the size of input cannot be"
-				"over %d bytes\n", MAX_LEN);
-		return -EINVAL;
-	} else {
-		copy_from_user(plaintext, buf, count);		// copy to plain data
-		psize = strlen(buf);
-	}
+	copy_from_user(plaintext, buf, count);		// copy to plain data
 	return count;
 }
 
 static ssize_t virtual_device_read(struct file *filp, char __user *buf, 
 		size_t count, loff_t *f_pos)
 {
-	char *p = (char *)kmalloc(MAX_LEN, GFP_KERNEL);
+	char *p;
 	printk("[Message] read function called\n");
 	p = hash_md5(plaintext);
-	copy_to_user(buf, p, MAX_LEN);
+	copy_to_user(buf, p, MD5_LEN);
+	kfree(p);
 	return count;
 }
 
@@ -182,7 +164,7 @@ static char *hash_md5(unsigned char *plaintext)
 
 	printk("hash_md5 function called\n");
 
-	result = (char *)kzalloc(16, GFP_KERNEL);
+	result = (char *)kzalloc(MD5_LEN, GFP_KERNEL);
 
 	handle = crypto_alloc_shash("md5", 0, 0);
 	if (IS_ERR(handle))
@@ -217,7 +199,6 @@ EXIT_ERROR:
 	if (handle)
 		crypto_free_shash(handle);
 
-	printk("hash_md5 function end\n");
 	return result;
 }
 
