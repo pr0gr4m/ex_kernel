@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#define BASIC
+
 #define BUF_LEN		1024
 #define TEXT_LEN	5
  
@@ -11,7 +13,7 @@ int main()
 {
     static char buf[1024];
     int fd;
- 
+
     if ((fd = open("/dev/chardev0", O_RDWR)) < 0) {
 		perror("open error");
     }

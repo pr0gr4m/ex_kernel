@@ -1,4 +1,4 @@
-obj-m += chardev.o ioctl.o
+obj-m += chardev.o ioctl.o cdev.o
 
 TARGETS = chardev_app ioctl_app
 
