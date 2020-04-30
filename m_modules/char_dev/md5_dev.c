@@ -17,7 +17,7 @@
 
 static unsigned char plaintext[1024];
 
-static char *hash_md5(unsigned char *buf);
+static bool hash_md5(char *result, unsigned char *data, size_t len);
 static void hexdump(unsigned char *buf, unsigned int len);
 static char *hexdump_as_str(unsigned char *buf, unsigned int len);
 
@@ -124,16 +124,16 @@ static ssize_t virtual_device_write(struct file *filp, const char __user *buf,
 		size_t count, loff_t *f_pos)
 {
 	printk("[Message] write function called\n");
-	copy_from_user(plaintext, buf, count);		// copy to plain data
+	copy_from_user(plaintext, buf, count);
 	return count;
 }
 
 static ssize_t virtual_device_read(struct file *filp, char __user *buf, 
 		size_t count, loff_t *f_pos)
 {
-	char *p;
+	char *p = (char *)kzalloc(MD5_LEN, GFP_KERNEL);
 	printk("[Message] read function called\n");
-	p = hash_md5(plaintext);
+	hash_md5(p, plaintext, strlen(plaintext));
 	copy_to_user(buf, p, MD5_LEN);
 	kfree(p);
 	return count;
@@ -155,51 +155,52 @@ static char *hexdump_as_str(unsigned char *buf, unsigned int len)
 	return str;
 }
 
-static char *hash_md5(unsigned char *plaintext)
+static bool hash_md5(char *result, unsigned char *data, size_t len)
 {
 	int i, success = 0;
-	char *result;
-	struct crypto_shash *handle = NULL;
-	struct shash_desc *shash = NULL;
+	struct crypto_shash *shash = NULL;
+	struct shash_desc *sdesc = NULL;
+	bool ret = true;
 
 	printk("hash_md5 function called\n");
 
-	result = (char *)kzalloc(MD5_LEN, GFP_KERNEL);
-
-	handle = crypto_alloc_shash("md5", 0, 0);
-	if (IS_ERR(handle))
+	shash = crypto_alloc_shash("md5", 0, 0);
+	if (IS_ERR(shash))
 		goto EXIT_ERROR;
-	shash = kmalloc(sizeof(struct shash_desc) + crypto_shash_descsize(handle),
+	sdesc = kmalloc(sizeof(struct shash_desc) + crypto_shash_descsize(shash),
 				GFP_KERNEL);
-	if (shash == NULL)
+	if (sdesc == NULL)
 		goto EXIT_ERROR;
 
-	shash->tfm = handle;
+	sdesc->tfm = shash;
 
-	success = crypto_shash_init(shash);
+	success = crypto_shash_init(sdesc);
 	if (success < 0)
 		goto EXIT_ERROR;
 
-	success = crypto_shash_update(shash, plaintext, strlen(plaintext));
+	success = crypto_shash_update(sdesc, data, len);
 	if (success < 0)
 		goto EXIT_ERROR;
 
-	success = crypto_shash_final(shash, result);
+	success = crypto_shash_final(sdesc, result);
 	if (success < 0)
 		goto EXIT_ERROR;
 
 	printk("[Message] ---------- test md5 ----------\n");
-	i = crypto_shash_digestsize(shash->tfm);
+	i = crypto_shash_digestsize(sdesc->tfm);
 	hexdump(result, i);
 	printk("[Message] Length: %d\n", i);
+	goto EXIT;
 
 EXIT_ERROR:
+	ret = false;
+EXIT:
+	if (sdesc)
+		kfree(sdesc);
 	if (shash)
-		kfree(shash);
-	if (handle)
-		crypto_free_shash(handle);
+		crypto_free_shash(shash);
 
-	return result;
+	return ret;
 }
 
 module_init(md5_init);
