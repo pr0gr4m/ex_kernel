@@ -1,10 +1,10 @@
-obj-m += simple_proc.o list_proc.o timer.o
+obj-m += delay.o rdtsc.o ktime.o
 
-#TARGETS = simple_proc_app
+TARGETS = rdtsc_app
+
 KDIR := /lib/modules/$(shell uname -r)/build
 
-# ${TARGETS]
-default:
+default: ${TARGETS}
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 CC := gcc
