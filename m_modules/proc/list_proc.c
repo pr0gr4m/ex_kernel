@@ -46,7 +46,7 @@ static int remove_sample_data(void)
 {
 	struct m_info *tmp;
 	struct list_head *node, *q;
-list_for_each_safe(node, q, &m_list) {
+	list_for_each_safe(node, q, &m_list) {
 		tmp = list_entry(node, struct m_info, list);
 		list_del(node);
 		kfree(tmp);
