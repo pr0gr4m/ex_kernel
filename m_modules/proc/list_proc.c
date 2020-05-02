@@ -165,7 +165,7 @@ int proc_init(void)
 		return -1;
 	}
 
-	if ((proc_file = proc_create(M_FILE, 0, proc_dir, &proc_ops)) == NULL) {
+	if ((proc_file = proc_create(M_FILE, 0666, proc_dir, &proc_ops)) == NULL) {
 		printk(KERN_ERR "Unable to create /proc/%s/%s\n", M_DIR, M_FILE);
 		remove_proc_entry(M_DIR, NULL);
 		return -1;
