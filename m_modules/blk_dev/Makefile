@@ -1,8 +1,10 @@
 obj-m += blkdev.o
 
+TARGETS = blkdev_app
+
 KDIR := /lib/modules/$(shell uname -r)/build
 
-default:
+default: ${TARGETS}
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 CC := gcc
