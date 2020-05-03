@@ -4,7 +4,7 @@
 #include <linux/mutex.h>
 #include <linux/list.h>
 
-#define USE_SINGLE_OPEN
+//#define USE_SINGLE_OPEN
 
 struct m_info {
 	int a;

@@ -1,6 +1,6 @@
 # Makefile to build all subdirs
 
-all: basic_t char_dev_t proc_t time_t
+all: basic_t char_dev_t blk_dev_t proc_t time_t
 
 basic_t:
 	@echo
@@ -19,6 +19,17 @@ char_dev_t:
 	@echo
 
 	make -C char_dev
+
+	@echo
+	@echo ==================== Build Complete ====================
+	@echo
+
+blk_dev_t:
+	@echo
+	@echo ==================== Build character device directory ====================
+	@echo
+
+	make -C blk_dev
 
 	@echo
 	@echo ==================== Build Complete ====================
