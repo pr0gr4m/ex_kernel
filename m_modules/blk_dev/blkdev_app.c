@@ -6,6 +6,7 @@
 #include <errno.h>
 
 #define BUF_LEN		1024
+#define DEV_NAME	"/dev/pr0gr4m-blkdev0"
  
 int main()
 {
@@ -13,7 +14,7 @@ int main()
     int fd;
 	off_t off;
 
-    if ((fd = open("/dev/sblkdev0", O_RDWR)) < 0) {
+    if ((fd = open(DEV_NAME, O_RDWR)) < 0) {
 		perror("open error");
     }
  
