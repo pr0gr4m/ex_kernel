@@ -176,13 +176,13 @@ static int blkdev_add_device(void)
 		dev->tag_set.nr_hw_queues = 1;
 		dev->tag_set.queue_depth = 128;
 		dev->tag_set.numa_node = NUMA_NO_NODE;
-		dev->tag_set.cmd_size = sizeof(sblkdev_cmd_t);
+		dev->tag_set.cmd_size = sizeof(block_cmd_t);
 		dev->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
 		dev->tag_set.driver_data = dev;
 
 		ret = blk_mq_alloc_tag_set(&dev->tag_set);
 		if (ret) {
-			printk(KERN_ERR "blk_mq_alloc_tag_set error");
+			printk(KERN_ERR "[pr0gr4m-blkdev] blk_mq_alloc_tag_set error");
 			break;
 		}
 
