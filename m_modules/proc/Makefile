@@ -1,4 +1,4 @@
-obj-m += simple_proc.o list_proc.o timer.o
+obj-m += simple_proc.o list_proc.o timer.o ex_proc.o
 
 #TARGETS = simple_proc_app
 KDIR := /lib/modules/$(shell uname -r)/build
