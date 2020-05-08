@@ -1,10 +1,10 @@
-obj-m += cache.o
+obj-m += cache.o mmap_dev.o
 
-#TARGETS = _app
+TARGETS = mmap_app
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
-default: #${TARGETS}
+default: ${TARGETS}
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 CC := gcc
