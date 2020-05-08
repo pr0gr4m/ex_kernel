@@ -1,5 +1,6 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/moduleparam.h>
 #include <linux/seq_file.h>
 #include <linux/sched/mm.h>
 #include <linux/mm.h>
@@ -10,9 +11,16 @@
 #define find_task_by_pid(nr)	pid_task(find_vpid(nr), PIDTYPE_PID)
 #endif
 
-#define TEST_PID	1
-
 #define BUF_SIZE	1024
+
+static int pid = 1;
+module_param(pid, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+
+static int is_stack(struct vm_area_struct *vma)
+{
+	return vma->vm_start <= vma->vm_mm->start_stack &&
+		vma->vm_end >= vma->vm_mm->start_stack;
+}
 
 static void show_map(pid_t pid)
 {
@@ -77,13 +85,17 @@ static void show_map(pid_t pid)
 			fullname = d_path(&file->f_path, buf, BUF_SIZE);
 			printk(KERN_CONT "%s", fullname);
 		} else {
+			if (!vma->vm_mm) {
+				printk(KERN_CONT "                    [ vdso ]");
+			}
+
 			if (mm) {
-				// heap
-				if (vma->vm_start <= mm->start_brk && vma->vm_end >= mm->brk)
+				if (vma->vm_start <= mm->brk && vma->vm_end >= mm->start_brk)
 					printk(KERN_CONT "                    [ heap ]");
-				else if (vma->vm_start <= mm->start_stack && vma->vm_end >= mm->start_stack)
+				else if (is_stack(vma))
 					printk(KERN_CONT "                    [ stack ]");
 			}
+			
 		}
 		printk(KERN_CONT "\n");
 		vma = vma->vm_next;
@@ -105,12 +117,12 @@ static int __init seq_init(void)
 	unsigned long text, lib, swap, anon, file, shmem;
 	unsigned long hiwater_vm, total_vm, hiwater_rss, total_rss;
 
-	printk("module init...\n");
-
-	if ((task = find_task_by_pid(TEST_PID)) == NULL) {
+	if ((task = find_task_by_pid(pid)) == NULL) {
 		printk(KERN_ERR "find_task_by_pid error \n");
 		return -1;
 	}
+
+	printk("View Process [%s]\n", task->comm);
 
 	if ((mm = get_task_mm(task)) == NULL) {
 		printk(KERN_ERR "get_task_mm error \n");
@@ -153,7 +165,7 @@ static int __init seq_init(void)
 	PRINTK_DEC("VmSwap : \t%8lu kB\n", swap);
 
 	up_read(&mm->mmap_sem);
-	show_map(TEST_PID);
+	show_map(pid);
 
 	return 0;
 }
