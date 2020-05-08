@@ -1,6 +1,7 @@
 # Makefile to build all subdirs
 
-all: basic_t char_dev_t blk_dev_t proc_t time_t
+all: basic_t char_dev_t blk_dev_t proc_t time_t \
+		ds_t mm_t
 
 basic_t:
 	@echo
@@ -26,7 +27,7 @@ char_dev_t:
 
 blk_dev_t:
 	@echo
-	@echo ==================== Build character device directory ====================
+	@echo ==================== Build block device directory ====================
 	@echo
 
 	make -C blk_dev
@@ -37,7 +38,7 @@ blk_dev_t:
 
 proc_t:
 	@echo
-	@echo ==================== Build character device directory ====================
+	@echo ==================== Build procfs directory ====================
 	@echo
 
 	make -C proc
@@ -48,7 +49,7 @@ proc_t:
 
 time_t:
 	@echo
-	@echo ==================== Build character device directory ====================
+	@echo ==================== Build timer device directory ====================
 	@echo
 
 	make -C time
@@ -57,8 +58,35 @@ time_t:
 	@echo ==================== Build Complete ====================
 	@echo
 
+mm_t:
+	@echo
+	@echo ==================== Build memory management directory ====================
+	@echo
+
+	make -C mm
+
+	@echo
+	@echo ==================== Build Complete ====================
+	@echo
+
+ds_t:
+	@echo
+	@echo ==================== Build data structure directory ====================
+	@echo
+
+	make -C ds
+
+	@echo
+	@echo ==================== Build Complete ====================
+	@echo
+
+
+
 clean:
 	make -C basic clean
 	make -C char_dev clean
+	make -C blk_dev clean
 	make -C proc clean
 	make -C time clean
+	make -C mm clean
+	make -C ds clean
