@@ -46,15 +46,14 @@ void show_list(void)
 			continue;
 		}
 
-		memcg = get_mem_cgroup_from_mm(NULL);
-
 		spin_lock_irq(&current_pglist->lru_lock);
 
-#if 0
-		lruvec = mem_cgroup_lruvec(memcg, current_pglist);
-#else
+#if 1
+		memcg = get_mem_cgroup_from_mm(NULL);
 		mz = mem_cgroup_nodeinfo(memcg, current_pglist->node_id);
 		lruvec = &mz->lruvec;
+#else
+		lruvec = mem_cgroup_lruvec(memcg, current_pglist);
 #endif
 
 		printk("========== LRU_ACTIVE_FILE ============\n");
