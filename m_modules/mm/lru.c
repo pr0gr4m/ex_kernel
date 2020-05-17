@@ -16,15 +16,13 @@ void show_pfn(struct list_head *src)
 
 	while (!list_empty(src))
 	{
-		if (++page_count > 20)
+		if (++page_count >= 20)
 			break;
 
 		p = lru_to_page(src);
 		printk(KERN_CONT "(%lx) ", page_to_pfn(p));
 		p = prev_page(p);
 	}
-
-	printk("page count: %d\n", page_count);
 }
 
 void show_list(void)
