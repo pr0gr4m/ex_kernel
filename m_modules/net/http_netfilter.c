@@ -24,6 +24,9 @@ static unsigned int hook_http(void *priv,
 		th = tcp_hdr(skb);
 
 		length = skb->len - iph->ihl * 4 - th->doff * 4;
+		if (length <= 4)
+			return NF_ACCEPT;
+
 		data = kzalloc(length, GFP_KERNEL);
 		memcpy(data, (unsigned char *)th + th->doff * 4, length);
 
