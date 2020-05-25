@@ -1,7 +1,7 @@
 # Makefile to build all subdirs
 
 all: basic_t char_dev_t blk_dev_t proc_t time_t \
-		ds_t mm_t
+		ds_t mm_t fs_t
 
 basic_t:
 	@echo
@@ -80,6 +80,18 @@ ds_t:
 	@echo ==================== Build Complete ====================
 	@echo
 
+fs_t:
+	@echo
+	@echo ==================== Build filesystem directory ====================
+	@echo
+
+	make -C fs
+
+	@echo
+	@echo ==================== Build Complete ====================
+	@echo
+
+
 
 
 clean:
@@ -90,3 +102,4 @@ clean:
 	make -C time clean
 	make -C mm clean
 	make -C ds clean
+	make -C fs clean
