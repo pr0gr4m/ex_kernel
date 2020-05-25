@@ -1,4 +1,4 @@
-obj-m += ex_netfilter.o http_netfilter.o
+obj-m += ex_netfilter.o http_netfilter.o view_netfilter.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
