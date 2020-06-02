@@ -1,4 +1,4 @@
-obj-m += list.o
+obj-m += list.o xarray.o
 
 TARGETS = linked
 
