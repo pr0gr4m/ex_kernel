@@ -1,4 +1,5 @@
 #include <linux/xarray.h>
+#include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/slab.h>
 
@@ -7,13 +8,12 @@ static DEFINE_XARRAY(array);
 static void xa_user_dump(const struct xarray *xa)
 {
 	void *entry = xa->xa_head;
-	unsigned int shift = 0;
 	pr_info("xarray: %px head %px flags %x marks %d %d %d\n", xa, entry,
 			xa->xa_flags, xa_marked(xa, XA_MARK_0),
 			xa_marked(xa, XA_MARK_1), xa_marked(xa, XA_MARK_2));
 }
 
-static int __init m_xarray_user_test(void)
+static int __init xarray_user_test(void)
 {
 	unsigned long i;
 	void *ret;
@@ -68,14 +68,14 @@ static int __init m_xarray_user_test(void)
 
 	xa_destroy(&array);
 	pr_info("xarray_user_test() end.\n");
-	return -EINVAL;
+	return 0;
 }
 
-static void __exit m_xarray_exit(void)
+static void __exit xarray_exit(void)
 {
 	pr_info("xarray_exit() end.\n");
 }
 
-module_init(m_xarray_user_test);
-module_exit(m_xarray_exit);
+module_init(xarray_user_test);
+module_exit(xarray_exit);
 MODULE_LICENSE("GPL");
