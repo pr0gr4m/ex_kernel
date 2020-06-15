@@ -1,4 +1,4 @@
-obj-m += sfs.o
+obj-m += sfs.o km_debugfs.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
