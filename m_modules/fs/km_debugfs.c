@@ -64,5 +64,5 @@ static int __init km_kernel_debugfs_init(void)
 
 late_initcall(km_kernel_debugfs_init);
 
-MODULE_DESCRIPTION("raspberrypi debug interface driver");
+MODULE_DESCRIPTION("debugfs driver");
 MODULE_LICENSE("GPL");
