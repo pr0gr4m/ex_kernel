@@ -1,4 +1,4 @@
-obj-m += cache.o mmap_dev.o show_mem.o lru.o
+obj-m += cache.o mmap_dev.o show_mem.o lru.o slab_ex.o
 
 TARGETS = mmap_app
 
